@@ -12,10 +12,10 @@ namespace FF::Wrapper {
 	public:
 		using Ptr = std::shared_ptr<Instance>;
 
-	
+
 
 		static Ptr create(bool enableValidationLayer) {
-		
+	
 			return std::make_shared<Instance>(enableValidationLayer);
 		}
 
@@ -111,7 +111,6 @@ enabledExtensionCount   传入扩展的数量 （要转化为uint32_t）
 
 ppEnabledExtensionNames 传入数据  （使用了vector 的data()    能够返回一个数组的首地址）
 
-
 然后就是 layer 的开启了，这里首先定义一个 二维数组 存储 layer 的 字符信息：
 
 ```cpp
@@ -183,8 +182,6 @@ if (vkCreateInstance(&instCreateInfo, nullptr, &mInstance) != VK_SUCCESS) {
 VkDebugUtilsMessengerEXT mDebugger;
 ```
 
-
-
 和创建instance一样，需要自己的createinfo—————— VkDebugUtilsMessengerCreateInfoEXT；在这里会定义一个函数：
 
 ```cpp
@@ -221,8 +218,7 @@ pUserData主要就是接收用户给到的数据，在debug中这里先为空；
 
 然后将debug数据传给instance；
 
-
-最后再构建下回调函数；和辅助的函数：
+再构建下回调函数；和辅助的函数：
 
 ```cpp
 	//validation layer 回调函数
@@ -241,7 +237,7 @@ pUserData主要就是接收用户给到的数据，在debug中这里先为空；
 		const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
 		const VkAllocationCallbacks* pAllocator,
 		VkDebugUtilsMessengerEXT* debugMessenger) {
-		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance,         "vkCreateDebugUtilsMessengerEXT");
 
 		if (func != nullptr) {
 			return func(instance, pCreateInfo, pAllocator, debugMessenger);
@@ -251,7 +247,17 @@ pUserData主要就是接收用户给到的数据，在debug中这里先为空；
 		}
 ```
 
+最后再给instanceCreateinfo传入layer的信息：
 
+```cpp
+if (mEnableValidationLayer) {
+	instCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+	instCreateInfo.ppEnabledLayerNames = validationLayers.data();
+	}
+	else {
+		instCreateInfo.enabledLayerCount = 0;
+}
+```
 
 最后的最后来看下完整的代码：
 
@@ -422,6 +428,5 @@ namespace FF::Wrapper {
 	}
 }
 ```
-
 
 整理完毕。一下就是 instance 和 debug的创建
