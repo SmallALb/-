@@ -82,6 +82,10 @@ std::vector< VkImage >：图像对象的数据结构 在这里使用了这个对
 
 std::vector< VkImageView >：描述了如何访问 VkImage 中的数据 在这里使用了这个对象的数组；
 
+自建一个 SwapChainSupportInfo  结构体：
+
+存放 VkSurfaceCapabilitiesKHR (交换链的各种范围的设置) 、std::vector< VkSurfaceFormatKHR >（存放所有的surfance格式）、 std::vector< VkPresentModeKHR >（存放所有的显示格式）
+
 每一个对象涉及到的东西都及其的多，之间的关联又及其的密集；但还是一步一步的看。
 
 先从 构造来看：
@@ -157,7 +161,7 @@ SwapChain::SwapChain(const Device::Ptr& device, const Window::Ptr& window, const
 }
 ```
 
-从上往下看   querySwapChainSupportInfo()：    这个函数主要是构建一个我门创建的结构体  SwapChainSupportInfo
+从上往下看   querySwapChainSupportInfo()：    这个函数主要是构建一个自己创建的结构体  SwapChainSupportInfo
 
 ```cpp
 SwapChainSupportInfo SwapChain::querySwapChainSupportInfo() {
@@ -200,7 +204,6 @@ vkGetPhysicalDeviceSurfacePresentModesKHR；
 
 最后将他传回去给 swapchain的构造函数中去;
 
-
 再来看看三个选择：
 
 ```cpp
@@ -211,8 +214,61 @@ VkPresentModeKHR presentMode = chooseSurfacePresentMode(swapChainSupportInfo.mPr
 VkExtent2D extent = chooseExtent(swapChainSupportInfo.mCapabilities);
 ```
 
-对构建得到的swapChaininfo中的信息中进行挑选；这里不细讲；
+对构建得到的swapChaininfo中的信息中进行挑选；这些信息符合某些模式就返回回去
 
+```cpp
+	VkSurfaceFormatKHR SwapChain::chooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
+		if (availableFormats.size() == 1 && availableFormats[0].format == VK_FORMAT_UNDEFINED) {
+			return { VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+		}
+
+		for (const auto& availableFormat : availableFormats) {
+			if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+				return availableFormat;
+			}
+		}
+
+		return availableFormats[0];
+	}
+```
+
+```cpp
+VkPresentModeKHR SwapChain::chooseSurfacePresentMode(const std::vector<VkPresentModeKHR>& availablePresenstModes) {
+	VkPresentModeKHR bestMode = VK_PRESENT_MODE_FIFO_KHR;
+
+	for (const auto& availablePresenstMode : availablePresenstModes) {
+		if (availablePresenstMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+			return availablePresenstMode;
+		}
+		else if (availablePresenstMode == VK_PRESENT_MODE_FIFO_KHR){
+			return bestMode;
+		}
+	}
+
+}
+```
+
+```cpp
+	VkExtent2D SwapChain::chooseExtent(const VkSurfaceCapabilitiesKHR& capabilities) {
+		if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+			return capabilities.currentExtent;
+		}
+	
+		int width = 0, height = 0;
+		glfwGetFramebufferSize(mWindow->getWindow(), &width, &height);
+
+		VkExtent2D actualExtent = {
+			static_cast<uint32_t>(width),
+			static_cast<uint32_t>(height)
+		};
+
+		actualExtent.width = std::max(capabilities.minImageExtent.width, 
+			std::min(capabilities.maxImageExtent.width, actualExtent.width));
+
+		actualExtent.height = std::max(capabilities.minImageExtent.height,
+			std::min(capabilities.maxImageExtent.height, actualExtent.height));
+	}
+```
 
 然后下面就是创建真正的 交换链信息 VkSwapchainCreateInfoKHR
 
@@ -231,7 +287,6 @@ createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 ```
 
 可以看出其实传入的都是些和图片相关的信息格式；
-
 
 下面再来看看根据队列族来设定的信息
 
@@ -252,7 +307,6 @@ else {
 当队列只有一个时，关闭图片资源共享，无需传入队列的信息；
 
 当队列有两个时，开启共享，得到指定的输出队列位置，绑定下信息。
-
 
 最后再将显示模式，容量的转换信息，剪裁信息传入：
 
@@ -454,14 +508,14 @@ namespace FF::Wrapper {
 				return bestMode;
 			}
 		}
-	
+
 	}
 
 	VkExtent2D SwapChain::chooseExtent(const VkSurfaceCapabilitiesKHR& capabilities) {
 		if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
 			return capabilities.currentExtent;
 		}
-	
+
 		int width = 0, height = 0;
 		glfwGetFramebufferSize(mWindow->getWindow(), &width, &height);
 
