@@ -389,14 +389,18 @@ sort(deq.begin(), deq.end());              //合法的！ √
 
 ---
 
-### std::set< type > / std::map< key, val> 散列集合(哈希表)
+### std::unordered_set< type > / std::unordered_map< key, val> 散列集合(哈希表)
 
-一种能够快速搜索集合里面有没有某个值的一种容器；
+一种能够快速搜索集合里面有没有某个值的一种容器；它两的搜索的平均时间复杂度都是：
 
-先来看看set容器:
+$$
+O(1)
+$$
+
+先来看看unordered_set容器:
 
 ```cpp
-    set<char> yu = {'a', 'b','e', 'i', 'o'};
+    unordered_set<char> yu = {'a', 'b','e', 'i', 'o'};
     yu.erase('b');
     yu.insert('u');
     cout<<(yu.count('u') ? "has val" : "no has")<<"\n";
@@ -406,12 +410,10 @@ sort(deq.begin(), deq.end());              //合法的！ √
   //no has
 ```
 
-他的搜索速度是在这些容器中最快的，而且会自动对插入的数进行排序
-
-而map是和pair一样有键有对应值，而且这个对应键的对应关系更为严谨，如果有学过python，应该都清楚字典序，而map就是C++的字典序：
+而unordered_map是和pair一样有键有对应值，而且这个对应键的对应关系更为严谨，如果有学过python，应该都清楚字典序，而unordered_map就是C++的字典序：
 
 ```cpp
-    map<string, char> level;
+    unordered_map<string, char> level;
 
     level.insert(make_pair("fish", 'A')); //插入可以使用make_pair(), 也可使用{}
     level.erase("fish");
@@ -426,9 +428,11 @@ sort(deq.begin(), deq.end());              //合法的！ √
     //no date
 ```
 
-和 set 一样，能够根据键（也就是第一个值）自动排序;
+去掉unordered_ 就会自动排序，map会对按照第一个键值对进行排序（ map / set）但是同时的他们搜索的平均时间复杂度, 会更慢是：
 
-在前面加上unordered_ 就不会自动排序，（unordered_map / unordered_set）
+$$
+O(logN)
+$$
 
 ---
 
@@ -473,7 +477,6 @@ string str3 = str.substr(2,3);
 //字符串切割,第一个传入从哪个下标开始切,第二个是告诉要切多少个
 // str3 = cde
 ```
-
 
 另外的对于字符串的处理在stl中还有一个叫做 stringstream 字符串流的stl容器,这个会在后面讲
 
