@@ -4,7 +4,7 @@ stl库是在C++中一个很重要的官方库，会用STL库，就能够很大�
 
 因此，学会使用stl库可以在竞赛中事半功倍，更好的利用写题的时间。
 
-## STL的标准输入输出
+## CPP的标准输入输出
 
 相信大家对这个头文件应该都熟悉的：
 
@@ -77,7 +77,7 @@ $$
 
 sort需要传入数组的两个指针，begin 到 end   表示对数组的这段区间进行排序，
 
-![1713884255283](images/速通C++STL/1713884255283.png)
+![1714037751317](images/速通C++STL/1714037751317.png)
 
 ### std::stable_sort() 归并排序
 
@@ -275,7 +275,7 @@ cout<<(nums.empty() ? "it is emptied!" : "not emptied!")<<"\n";
 
 ---
 
-### std::queue< type > / std::stack< type > / dequeue< type > 队列 / 栈 / 双端队列
+### std::queue< type > / std::stack< type > / deque< type > 队列 / 栈 / 双端队列
 
 栈与队列不了解的可以先看看这篇 [栈与队列]([-/数据结构笔记/链表/5.栈与队列.md at main · SmallALb/- (github.com)](https://github.com/SmallALb/-/blob/main/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AC%94%E8%AE%B0/%E9%93%BE%E8%A1%A8/5.%E6%A0%88%E4%B8%8E%E9%98%9F%E5%88%97.md#%E6%A0%88%E4%B8%8E%E9%98%9F%E5%88%97))
 
@@ -428,7 +428,7 @@ $$
     //no date
 ```
 
-去掉unordered_ 就会自动排序，map会对按照第一个键值对进行排序（ map / set）但是同时的他们搜索的平均时间复杂度, 会更慢是：
+去掉unordered_ 就会自动排序，map会对按照第一个键值对进行排序（ map / set）但是同时的他们搜索的平均时间复杂度会更慢 （因为有序map/set的实现逻辑是红黑树）：
 
 $$
 O(logN)
