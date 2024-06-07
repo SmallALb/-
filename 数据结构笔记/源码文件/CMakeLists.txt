@@ -8,3 +8,5 @@ add_executable(stack 栈.cpp)
 add_executable(hashmap 哈希表.cpp)
 
 add_executable(Tree 二叉树遍历.cpp)
+
+add_executable(searchTree 二叉搜索树.cpp)
