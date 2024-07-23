@@ -122,7 +122,6 @@ int main() {
 
 ## AC自动机构建
 
-
 既然已经知道如何构建一个Trie树，那就能够很轻易的创建一个AC自动机，那AC自动机的应用一般是什么呢？
 
 比如说，查找一个字符串的出现的敏感词数量；找到一整个串的敏感词的下标起始点等等，一系列有关子串匹配的操作。
@@ -133,13 +132,11 @@ int main() {
 （这里就以解决查找匹配字符串的个数为例子，要想实现其他功能，同样是在这个模板下进行修改即可）
 ```
 
-
 答案是肯定的。
 
 不妨先来观察观察这颗树
 
 ![1719674892874](images/Trie树与AC自动机/1719674892874.png)
-
 
 比如我现在有一个串 "sakabey" 符合的子串数应该是2；从根节点出发 s->a->k->a；这时候已经到叶子节点了；不能再往下走了；可是字符串还没有便利完；而b->e->y这一段是从头节点开始的，那我们就回到头节点，走bey这条路，就能够一次遍历完成；即为：
 
@@ -208,12 +205,14 @@ void buildfail() {
         Q.pop();
   
         for (int i=0; i<26; i++) {
-            if (!mp[T][i]) continue;
-            //这里也是因为fails、mp数组元素都是默认为0的，直接让其fail指针指向其父节点fail指针下面的对应节点即可
-            fails[mp[T][i]] = mp[fails[T]][i];
-            //将节点fail指针的对应字符计数添加到源节点上;
-            cnts[mp[T][i]] += cnts[fails[mp[T][i]]];
-            Q.push(mp[T][i]);
+            if (mp[T][i]) {
+                fails[mp[T][i]] = mp[fails[T]][i];
+                //节点匹配失败的节点的字符计数需要加到源节点种去
+                cnts[mp[T][i]] += cnts[fails[mp[T][i]]];
+                Q.push(mp[T][i]);
+            }
+            //没有的这个节点直接让其指向父节点的失败节点的同一字符的节点
+            else  mp[T][i] = mp[fails[T]][i];
         }
     }
 }
@@ -268,11 +267,15 @@ void buildfail() {
         Q.pop();
 
         for (int i=0; i<26; i++) {
-            if (!mp[T][i]) continue;
-            fails[mp[T][i]] = mp[fails[T]][i];
-            cnts[mp[T][i]] += cnts[fails[mp[T][i]]];
-            Q.push(mp[T][i]);
-        }
+            if (mp[T][i]) {
+                fails[mp[T][i]] = mp[fails[T]][i];
+                //节点匹配失败的节点的字符计数需要加到源节点种去
+                cnts[mp[T][i]] += cnts[fails[mp[T][i]]];
+                Q.push(mp[T][i]);
+            }
+            //没有的这个节点直接让其指向父节点的失败节点的同一字符的节点
+            else  mp[T][i] = mp[fails[T]][i];
+        }    
     }
 }
 
